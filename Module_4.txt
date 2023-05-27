@@ -1,0 +1,77 @@
+import cv2
+import numpy as np
+from keras.models import load_model
+
+# Load the sign recognition model
+model = load_model('sign_model.h5')
+
+# Define the classes
+classes = {
+    0: '0',
+    1: '1',
+    2: '2',
+    3: '3',
+    4: '4',
+    5: '5',
+#     6: '6',
+#     7: '7',
+#     8: '8',
+#     9: '9'
+   }
+
+# Start capturing video from the default camera
+
+cap = cv2.VideoCapture(0)
+# width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+# height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+# cap = cv2.VideoCapture(0)
+# print("Opening Camera..")
+
+# Loop through each frame in the video stream
+while True:
+    # Read a frame from the video stream
+    ret, frame = cap.read()
+    
+    # Convert the frame to grayscale
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    
+    
+    # Crop the region of interest (ROI) to only include the hand
+    roi = gray[100:400, 100:400]
+    
+    # Resize the ROI to 49x49 pixels
+    resized = cv2.resize(roi, (49, 49), interpolation=cv2.INTER_AREA)
+    
+    # Reshape the resized image to have a single channel
+    reshaped = np.reshape(resized, (49, 49, 1))
+    
+    # Normalize the pixel values between 0 and 1
+    normalized = reshaped / 255.0
+    
+    # Make a prediction using the model
+    prediction = model.predict(np.array([normalized]))
+    
+    # Get the predicted class index
+    predicted_class = np.argmax(prediction)
+#     print(predicted_class)
+    
+    # Get the predicted class label
+    predicted_label = classes[predicted_class]
+    print("Label: ",predicted_label)
+    
+    
+    # Display the predicted label on the video stream
+    cv2.putText(frame, predicted_label, (49, 49), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3)
+    # Show the video stream
+    cv2.imshow('Sign Recognition', frame)
+    
+    
+    # Exit the loop if the 'q' key is pressed
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# Release the video stream and close all windows
+cap.release()
+cv2.destroyAllWindows()
+print("Quit...")

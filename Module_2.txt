@@ -1,0 +1,58 @@
+import os
+
+# Set the path of the folder containing the images
+folder_path = 'y'
+
+# Set the prefix you want to use for the new filenames
+prefix = 'Y'
+
+# Set a counter to keep track of the number of images
+count = 1
+
+# Loop through all the files in the folder
+for filename in os.listdir(folder_path):
+    # Check if the file is an image (you can modify this condition to suit your needs)
+    if filename.endswith('.jpg') or filename.endswith('.png') or filename.endswith('.jpeg'):
+        # Construct the new filename using the prefix and the counter
+        new_filename = prefix + str(count) + os.path.splitext(filename)[1]
+
+        # Construct the full path of the image
+        full_path = os.path.join(folder_path, filename)
+
+        # Construct the full path of the new image
+        new_full_path = os.path.join(folder_path, new_filename)
+
+        # Rename the image
+        os.rename(full_path, new_full_path)
+
+        # Increment the counter
+        count += 1
+        
+print("DONE_Rename")
+
+
+from PIL import Image
+import os
+
+input_dir = "y"
+output_dir = "Y1"
+
+# Loop through each image file in the input directory
+for filename in os.listdir(input_dir):
+    if filename.endswith(".jpeg") or filename.endswith(".png"):
+        # Open the image file
+        img_path = os.path.join(input_dir, filename)
+        img = Image.open(img_path)
+
+        # Convert the image to grayscale
+        gray_img = img.convert('L')
+
+        # Resize the image to 28x28 pixels
+        resized_img = gray_img.resize((49, 49))
+
+        # Save the resized grayscale image to the output directory
+        output_path = os.path.join(output_dir, filename)
+        resized_img.save(output_path)
+        
+print("DONE_Convert")
+
